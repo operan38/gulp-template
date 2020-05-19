@@ -111,7 +111,7 @@ function jsFunc() {
 	return src(path.src.js)
 		.pipe(fileInclude())
 		.pipe(babel({
-            presets: ['es2015']
+            presets: ['@babel/env']
 		}))
 		.pipe(dest(path.build.js)) // Выгрузка не сжатого js файла
 		.pipe(uglify())
