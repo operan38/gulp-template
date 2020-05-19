@@ -45,7 +45,8 @@ let { src, dest, } = require('gulp'),
 	svgSprite = require('gulp-svg-sprite'), // Создание svg спрайтов
 	ttf2woff = require('gulp-ttf2woff'), // Конвертер шрифтов woff
 	ttf2woff2 = require('gulp-ttf2woff2'), // Конвертер шрифтов woff2
-	fonter = require('gulp-fonter'); // Конвертер шрифтов
+	fonter = require('gulp-fonter'), // Конвертер шрифтов
+	babel = require('gulp-babel');
 
 function browserSyncFunc() {
 	browserSync.init({
@@ -109,6 +110,9 @@ function cssFunc() {
 function jsFunc() {
 	return src(path.src.js)
 		.pipe(fileInclude())
+		.pipe(babel({
+            presets: ['es2015']
+		}))
 		.pipe(dest(path.build.js)) // Выгрузка не сжатого js файла
 		.pipe(uglify())
 		.pipe(
