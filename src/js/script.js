@@ -1,6 +1,6 @@
 // Проверка браузера на поддержку webp
 
-function testWebP(callback) {
+/* function testWebP(callback) {
 	const webP = new Image();
 
 	// eslint-disable-next-line no-multi-assign
@@ -18,4 +18,9 @@ testWebP((support) => {
 	} else {
 		document.querySelector('body').classList.add('no-webp');
 	}
-});
+}); */
+@@include('jquery-3.5.1.min.js')
+
+$(document).ready(() => {
+
+})

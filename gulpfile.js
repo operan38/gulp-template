@@ -69,7 +69,7 @@ function cleanFunc() {
 function htmlFunc() {
 	return src(path.src.html)
 		.pipe(fileInclude())
-		.pipe(webpHtml())
+		//.pipe(webpHtml())
 		.pipe(dest(path.build.html))
 		.pipe(browserSync.stream())
 }
@@ -90,10 +90,10 @@ function cssFunc() {
 				cascade: true
 			})
 		)
-		.pipe(webpCss({
+		/*.pipe(webpCss({
 			webpClass: '.webp',
 			noWebpClass: '.no-webp'
-		}))
+		}))*/
 		.pipe(dest(path.build.css)) // Выгрузка не сжатого css файла
 		.pipe(cleanCss())
 		.pipe(
@@ -128,12 +128,12 @@ function jsFunc() {
 
 function imgFunc() {
 	return src(path.src.img)
-		.pipe(
+		/*.pipe(
 			webp({
 				quality: 70
 			})
 		)
-		.pipe(dest(path.build.img)) // Выгрузить webp изображения
+		.pipe(dest(path.build.img))*/ // Выгрузить webp изображения
 		.pipe(src(path.src.img))
 		.pipe(
 			imageMin({
@@ -170,7 +170,7 @@ gulp.task('otf-ttf', function() {
 
 // Создание svg спрайтов
 
-gulp.task('svg-sprite', function() {
+/*gulp.task('svg-sprite', function() {
 	return gulp.src([source + '/iconsprite/*.svg'])
 		.pipe(svgSprite({
 			mode: {
@@ -181,7 +181,7 @@ gulp.task('svg-sprite', function() {
 			}
 		}))
 		.pipe(dest(path.build.img))
-})
+})*/
 
 // Функция для записи в fonts.scss
 
