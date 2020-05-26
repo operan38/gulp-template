@@ -14,7 +14,7 @@ let path = {
 	src: {
 		html: [source+'/*.html', '!' + source + '/_*.html'],
 		css: source+'/scss/style.scss',
-		js: source+'/js/script.js',
+		js: source+'/js/**/*.js',
 		img: source+'/img/**/*.{jpg,png,svg,gif,ico,webp}',
 		fonts: source+'/fonts/*.ttf',
 	},
@@ -39,13 +39,10 @@ let { src, dest, } = require('gulp'),
 	rename = require('gulp-rename'), // Переименование файла
 	uglify = require('gulp-uglify-es').default, // Сжатие js файла
 	imageMin = require('gulp-imagemin'), // Сжатие картинок
-	webp = require('gulp-webp'), // Конвертация изображений в webp
-	webpHtml = require('gulp-webp-html'), // Интеграция html кода для подключения webp изображения
-	webpCss = require('gulp-webpcss'), // Интеграция css кода для подключения webp изображения
-	svgSprite = require('gulp-svg-sprite'), // Создание svg спрайтов
 	ttf2woff = require('gulp-ttf2woff'), // Конвертер шрифтов woff
 	ttf2woff2 = require('gulp-ttf2woff2'), // Конвертер шрифтов woff2
 	fonter = require('gulp-fonter'), // Конвертер шрифтов
+	concat = require('gulp-concat'),
 	babel = require('gulp-babel');
 
 function browserSyncFunc() {
@@ -69,7 +66,6 @@ function cleanFunc() {
 function htmlFunc() {
 	return src(path.src.html)
 		.pipe(fileInclude())
-		//.pipe(webpHtml())
 		.pipe(dest(path.build.html))
 		.pipe(browserSync.stream())
 }
@@ -90,10 +86,6 @@ function cssFunc() {
 				cascade: true
 			})
 		)
-		/*.pipe(webpCss({
-			webpClass: '.webp',
-			noWebpClass: '.no-webp'
-		}))*/
 		.pipe(dest(path.build.css)) // Выгрузка не сжатого css файла
 		.pipe(cleanCss())
 		.pipe(
@@ -109,10 +101,10 @@ function cssFunc() {
 
 function jsFunc() {
 	return src(path.src.js)
-		.pipe(fileInclude())
 		.pipe(babel({
             presets: ['@babel/env']
 		}))
+		.pipe(concat('bundle.js'))
 		.pipe(dest(path.build.js)) // Выгрузка не сжатого js файла
 		.pipe(uglify())
 		.pipe(
@@ -128,12 +120,6 @@ function jsFunc() {
 
 function imgFunc() {
 	return src(path.src.img)
-		/*.pipe(
-			webp({
-				quality: 70
-			})
-		)
-		.pipe(dest(path.build.img))*/ // Выгрузить webp изображения
 		.pipe(src(path.src.img))
 		.pipe(
 			imageMin({
@@ -158,6 +144,13 @@ function fontFunc() {
 		.pipe(dest(path.build.fonts));
 }
 
+// Перемещение папки libs в dist
+
+function libsToDistFunc() {
+	return src(source + '/libs/**/*.js')
+		.pipe(dest(dist + '/libs/'))
+}
+
 // Конвертация шрифтов из otf в ttf
 
 gulp.task('otf-ttf', function() {
@@ -167,21 +160,6 @@ gulp.task('otf-ttf', function() {
 		}))
 		.pipe(dest(source + '/fonts/'))
 })
-
-// Создание svg спрайтов
-
-/*gulp.task('svg-sprite', function() {
-	return gulp.src([source + '/iconsprite/*.svg'])
-		.pipe(svgSprite({
-			mode: {
-				stack: {
-					sprite: '../icons/icons.svg',
-					example: true
-				}
-			}
-		}))
-		.pipe(dest(path.build.img))
-})*/
 
 // Функция для записи в fonts.scss
 
@@ -216,7 +194,7 @@ function watchFunc() {
 	gulp.watch([path.watch.img], imgFunc);
 }
 
-let build = gulp.series(cleanFunc, gulp.parallel(htmlFunc, cssFunc, jsFunc, imgFunc, fontFunc), saveFontsStyle);
+let build = gulp.series(cleanFunc, gulp.parallel(htmlFunc, cssFunc, jsFunc, imgFunc, fontFunc, libsToDistFunc), saveFontsStyle);
 let watch = gulp.parallel(build, watchFunc, browserSyncFunc);
 
 exports.html = htmlFunc;
@@ -224,6 +202,7 @@ exports.css = cssFunc;
 exports.js = jsFunc;
 exports.img = imgFunc;
 exports.font = fontFunc;
+exports.libsToDistFunc = libsToDistFunc;
 exports.saveFontsStyle = saveFontsStyle;
 
 exports.build = build;

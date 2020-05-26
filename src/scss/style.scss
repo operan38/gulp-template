@@ -1,6 +1,13 @@
-@import 'reset';
 @import 'mixins';
 @import 'fonts';
+
+//
+
+@import 'bootstrap/bootstrap-grid.scss';
+@import '../css/aos';
+@import '../css/baguetteBox.min';
+
+//
 
 @import 'header';
 @import 'content';
