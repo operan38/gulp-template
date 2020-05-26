@@ -43,7 +43,8 @@ let { src, dest, } = require('gulp'),
 	ttf2woff2 = require('gulp-ttf2woff2'), // Конвертер шрифтов woff2
 	fonter = require('gulp-fonter'), // Конвертер шрифтов
 	concat = require('gulp-concat'),
-	babel = require('gulp-babel');
+	babel = require('gulp-babel'),
+	sourceMaps = require('gulp-sourcemaps');
 
 function browserSyncFunc() {
 	browserSync.init({
@@ -73,7 +74,7 @@ function htmlFunc() {
 // Сборка scss файлов в style.css и style.min.css
 
 function cssFunc() {
-	return src(path.src.css)
+	return src(path.src.css, { sourcemaps: true })
 		.pipe(
 			scss({
 				outputStyle: "expanded"
@@ -86,14 +87,14 @@ function cssFunc() {
 				cascade: true
 			})
 		)
-		.pipe(dest(path.build.css)) // Выгрузка не сжатого css файла
+		//.pipe(dest(path.build.css)) // Выгрузка не сжатого css файла
 		.pipe(cleanCss())
 		.pipe(
 			rename({
 				extname: '.min.css'
 			})
 		)
-		.pipe(dest(path.build.css)) // Выгрузка сжатого css файла
+		.pipe(dest(path.build.css, { sourcemaps: '.' })) // Выгрузка сжатого css файла
 		.pipe(browserSync.stream())
 }
 
@@ -101,17 +102,19 @@ function cssFunc() {
 
 function jsFunc() {
 	return src(path.src.js)
+		.pipe(sourceMaps.init())
 		.pipe(babel({
             presets: ['@babel/env']
 		}))
 		.pipe(concat('bundle.js'))
-		.pipe(dest(path.build.js)) // Выгрузка не сжатого js файла
+		//.pipe(dest(path.build.js)) // Выгрузка не сжатого js файла
 		.pipe(uglify())
 		.pipe(
 			rename({
 				extname: '.min.js'
 			})
 		)
+		.pipe(sourceMaps.write('.'))
 		.pipe(dest(path.build.js)) // Выгрузка сжатого js файла
 		.pipe(browserSync.stream())
 }
@@ -129,7 +132,7 @@ function imgFunc() {
 				optimizationLevel: 3 // 0 - 7
 			})
 		)
-		.pipe(dest(path.build.img)) // Выгрузить остальные изображения
+		.pipe(dest(path.build.img)) // Выгрузить изображения
 		.pipe(browserSync.stream())
 }
 
